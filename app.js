@@ -2,7 +2,7 @@ require("express-async-errors");
 const express = require("express");
 const app = express();
 const urlRouter = require("./routes/url");
-const redirectRouter = require('./routes/redirect')
+const redirectRouter = require("./routes/redirect");
 const connectDB = require("./db/connect");
 
 const port = process.env.PORT || 3000;
@@ -10,8 +10,7 @@ const port = process.env.PORT || 3000;
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-
-app.use('/', redirectRouter)
+app.use("/", redirectRouter);
 app.use("/api/v1", urlRouter);
 
 const start = async () => {
