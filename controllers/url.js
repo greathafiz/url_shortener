@@ -1,10 +1,12 @@
 const checkUrl = require("valid_url");
 const generateUniqueId = require("generate-unique-id");
 const Url = require("../model/Url");
+const { CustomAPIError } = require("../errors/custom-error");
 
 const generateShortUrl = async (req, res) => {
   const { originalUrl } = req.body;
   const urlId = generateUniqueId({ length: 7 });
+
   if (checkUrl(originalUrl)) {
     let url = await Url.findOne({ originalUrl });
     if (url) {
@@ -21,11 +23,11 @@ const generateShortUrl = async (req, res) => {
       res.status(201).json(url);
     }
   } else {
-    return res.status(400).json({ error: "Invalid URL" });
+    throw new CustomAPIError("Invalid URL", 400);
   }
 };
 
-// shortened url redirect
+// redirect shortened url to original url
 const handleUrlRedirect = async (req, res) => {
   const { id } = req.params;
   const url = await Url.findOneAndUpdate(
@@ -34,7 +36,7 @@ const handleUrlRedirect = async (req, res) => {
   );
 
   if (!url) {
-    return res.status(404).json({ msg: "Not Found" });
+    throw new CustomAPIError("Not Found", 404);
   }
   res.status(301).redirect(url.originalUrl);
 };

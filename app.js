@@ -4,6 +4,7 @@ const app = express();
 const urlRouter = require("./routes/url");
 const redirectRouter = require("./routes/redirect");
 const connectDB = require("./db/connect");
+const errorHandlerMiddleware = require("./middleware/error-handler");
 
 const port = process.env.PORT || 3000;
 
@@ -13,9 +14,11 @@ app.use(express.json());
 app.use("/", redirectRouter);
 app.use("/api/v1", urlRouter);
 
+app.use(errorHandlerMiddleware);
+
 const start = async () => {
   try {
-    await connectDB(process.env.MONGO_URI);
+    await connectDB();
     app.listen(port, console.log(`Server running on port ${port}`));
   } catch (error) {
     console.error(error);
