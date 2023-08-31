@@ -1,7 +1,8 @@
 const checkUrl = require("valid_url");
 const generateUniqueId = require("generate-unique-id");
 const Url = require("../model/Url");
-const { CustomAPIError } = require("../errors/custom-error");
+const jwt = require('jsonwebtoken')
+const { BadRequestError, NotFoundError } = require("../errors");
 
 const generateShortUrl = async (req, res) => {
   const { originalUrl } = req.body;
@@ -23,7 +24,7 @@ const generateShortUrl = async (req, res) => {
       res.status(201).json(url);
     }
   } else {
-    throw new CustomAPIError("Invalid URL", 400);
+    throw new BadRequestError("Invalid URL");
   }
 };
 
@@ -36,7 +37,7 @@ const handleUrlRedirect = async (req, res) => {
   );
 
   if (!url) {
-    throw new CustomAPIError("Not Found", 404);
+    throw new NotFoundError("Not Found");
   }
   res.status(301).redirect(url.originalUrl);
 };
