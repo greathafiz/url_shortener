@@ -1,14 +1,14 @@
-const checkUrl = require("valid_url");
+const { StatusCodes } = require("http-status-codes");
+const isUrlHttp = require('is-url-http')
 const generateUniqueId = require("generate-unique-id");
 const Url = require("../model/Url");
-const jwt = require('jsonwebtoken')
 const { BadRequestError, NotFoundError } = require("../errors");
 
 const generateShortUrl = async (req, res) => {
   const { originalUrl } = req.body;
   const urlId = generateUniqueId({ length: 7 });
 
-  if (checkUrl(originalUrl)) {
+  if (isUrlHttp(originalUrl)) {
     let url = await Url.findOne({ originalUrl });
     if (url) {
       res.json(url);
@@ -21,7 +21,7 @@ const generateShortUrl = async (req, res) => {
         shortenedUrl,
       });
       await url.save();
-      res.status(201).json(url);
+      res.status(StatusCodes.CREATED).json(url);
     }
   } else {
     throw new BadRequestError("Invalid URL");
@@ -39,7 +39,7 @@ const handleUrlRedirect = async (req, res) => {
   if (!url) {
     throw new NotFoundError("Not Found");
   }
-  res.status(301).redirect(url.originalUrl);
+  res.status(StatusCodes.MOVED_PERMANENTLY).redirect(url.originalUrl);
 };
 
 module.exports = {
